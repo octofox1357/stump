@@ -142,9 +142,9 @@
 	<canvas style="position: absolute; z-index: -1;" bind:this={canvas} />
 	<div class="text-center" style="z-index: 2">
 		<Heading tag="h1" class="mb-4" customSize="text-4xl font-extrabold md:text-5xl lg:text-6xl"
-			>당신의 생각이 책을 완성합니다.<br />
+			>당신의 생각이 책을 완성합니다<br />
 			<Secondary tag="h1" class="mb-4" customSize="text-4xl font-extrabold md:text-5xl lg:text-6xl"
-				>읽고, 느끼고, 코멘트하세요.</Secondary
+				>읽고, 느끼고, 코멘트하세요</Secondary
 			>
 		</Heading>
 	</div>
