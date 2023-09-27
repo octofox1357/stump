@@ -1,5 +1,5 @@
 <script>
-	import { onMount, onDestroy } from 'svelte';
+	import { onMount } from 'svelte';
 	import ePub from 'epubjs';
 
 	let book;
@@ -7,12 +7,12 @@
 
 	onMount(() => {
 		book = ePub('/nwt_KO.epub');
-
 		rendition = book.renderTo('book', {
 			spread: 'always',
 			height: 'calc(100vh - 72px)'
 		});
 		rendition.display();
+
 		const next = document.getElementById('next');
 		const prev = document.getElementById('prev');
 		next.addEventListener('click', function (e) {
@@ -24,10 +24,10 @@
 			e.preventDefault();
 		});
 		document.addEventListener('keyup', function (e) {
-			if (e.keyCode === 37) {
+			if (e.key === 'ArrowLeft') {
 				rendition.prev();
 			}
-			if (e.keyCode === 39) {
+			if (e.key === 'ArrowRight') {
 				rendition.next();
 			}
 		});
