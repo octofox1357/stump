@@ -30,6 +30,7 @@
   },
   "type": "module",
   "dependencies": {
+    "dexie": "next",
     "epubjs": "^0.3.93",
     "flowbite-svelte-icons": "^0.4.4",
     "svelte-add": "latest",
