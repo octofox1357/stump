@@ -4,10 +4,8 @@
 
 	let book;
 	let rendition;
-	let mousePosition;
-	let tooltip;
 	let iframe;
-	let timeout;
+	let isTextSelected = false;
 
 	onMount(() => {
 		book = ePub('/nwt_KO.epub');
@@ -17,45 +15,54 @@
 		});
 
 		rendition.on('rendered', function (section) {
+			// iframe 찾기
 			const iframeElement = document.querySelector('iframe[id^="epubjs-view-"]');
 
 			if (iframeElement instanceof HTMLIFrameElement) {
 				iframe = iframeElement;
 
-				iframe.contentWindow.addEventListener('click', function (event) {
-					// 툴팁이 이미 있는 경우 제거
-					if (tooltip && tooltip.parentNode) {
-						tooltip.parentNode.removeChild(tooltip);
+				// 클릭시 툴팁이 이미 있는 경우 제거
+				iframe.contentWindow.addEventListener('mousedown', function (event) {
+					isTextSelected = false;
+					const existingTooltip = iframe.contentDocument.querySelector('.my-tooltip');
+					if (existingTooltip) {
+						existingTooltip.remove();
 					}
 				});
 
-				iframe.contentWindow.addEventListener('mousemove', function (event) {
-					clearTimeout(timeout); // 기존의 디바운스 타임아웃을 제거
-					timeout = setTimeout(() => {
-						mousePosition = {
-							x: event.clientX,
-							y: event.clientY
-						};
-						console.log(mousePosition);
-					}, 100); // 100ms 동안 추가 이벤트가 없으면 실행
+				iframe.contentWindow.addEventListener('mouseup', function (event) {
+					const existingTooltip = iframe.contentDocument.querySelector('.my-tooltip');
+					if (existingTooltip) {
+						existingTooltip.remove();
+						isTextSelected = false;
+					}
+
+					if (isTextSelected) {
+						let tooltip = document.createElement('div');
+						tooltip.className = 'my-tooltip'; // 클래스 이름 추가
+						tooltip.innerHTML =
+							'<button id="highlight">Highlight</button><button id="annotate">Annotate</button>';
+						tooltip.style.position = 'fixed';
+						tooltip.style.zIndex = '999';
+						tooltip.style.border = '1px solid black';
+						tooltip.style.left = `${event.clientX}px`;
+						tooltip.style.top = `${event.clientY}px`;
+						if (iframe && iframe.contentDocument) {
+							iframe.contentDocument.body.appendChild(tooltip);
+						}
+						isTextSelected = false; // 툴팁이 생성된 후에 isTextSelected를 false로 설정
+					} else {
+						const existingTooltip = iframe.contentDocument.querySelector('.my-tooltip');
+						if (existingTooltip) {
+							existingTooltip.remove();
+						}
+					}
 				});
 			}
 		});
 
 		rendition.on('selected', function (cfiRange, contents) {
-			tooltip = document.createElement('div');
-			tooltip.innerHTML =
-				'<button id="highlight">Highlight</button><button id="annotate">Annotate</button>';
-			tooltip.style.position = 'fixed';
-			tooltip.style.zIndex = '1000';
-			tooltip.style.background = 'white';
-			tooltip.style.border = '1px solid black';
-
-			tooltip.style.left = `${mousePosition.x}px`;
-			tooltip.style.top = `${mousePosition.y}px`;
-			if (iframe && iframe.contentDocument) {
-				iframe.contentDocument.body.appendChild(tooltip);
-			}
+			isTextSelected = true;
 		});
 
 		rendition.display();
@@ -77,6 +84,10 @@
 			if (e.key === 'ArrowRight') {
 				rendition.next();
 			}
+		});
+
+		window.addEventListener('unload', function () {
+			book.destroy();
 		});
 	});
 </script>
